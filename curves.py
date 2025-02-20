@@ -1,5 +1,3 @@
-import numpy as np
-import torch
 
 def gilbert2d(width, height):
     """
@@ -142,5 +140,9 @@ def compute_curve_order(grid, orientation):
     elif orientation == 'hr':  
         order = compute_hilbert_order(grid)   
         order = [(y,x) for x,y in order]
-    
+    elif orientation == 'm':
+        order = compute_morton_order(grid)
+    elif orientation == 'mr':
+        order = compute_morton_order(grid)
+        order = [(y,x) for x,y in order]
     return order
