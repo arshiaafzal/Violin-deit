@@ -4,3 +4,5 @@ imnet_resnet50_scratch/timm_temp/
 .dumbo.json
 checkpoints/
 Deit_origional/custom-pytorch-image-models/
+Deit_origional/slurm-198563.out
+Deit_origional/slurm-198568.out
