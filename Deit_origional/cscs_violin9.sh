@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=256G
 #SBATCH --account=a-a06
-#SBATCH --output=$SCRATCH/Violin-deit/Deit_origional/slurm_outs/v9_%j.log
+#SBATCH --output=slurm_outs/v9_%j.log
 
 python -m torch.distributed.launch --nproc_per_node=4 --use_env main.py --model violin_tiny --batch-size 256 --data-path $SCRATCH/imagenet --output_dir $SCRATCH/output1 \
                                                                         --pos_emb --mask weighted --method add_v1
