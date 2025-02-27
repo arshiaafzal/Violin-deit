@@ -1,0 +1,91 @@
+/users/aafzal/miniconda3/envs/lion2/lib/python3.9/site-packages/torch/distributed/launch.py:208: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use-env is set by default in torchrun.
+If your script expects `--local-rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  main()
+W0226 22:35:30.160170 151066 site-packages/torch/distributed/run.py:792] 
+W0226 22:35:30.160170 151066 site-packages/torch/distributed/run.py:792] *****************************************
+W0226 22:35:30.160170 151066 site-packages/torch/distributed/run.py:792] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0226 22:35:30.160170 151066 site-packages/torch/distributed/run.py:792] *****************************************
+| distributed init (rank 0): env://
+| distributed init (rank 2): env://
+| distributed init (rank 3): env://
+| distributed init (rank 1): env://
+[rank3]:[W226 22:35:47.121812557 ProcessGroupNCCL.cpp:4561] [PG ID 0 PG GUID 0 Rank 3]  using GPU 3 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+[rank1]:[W226 22:35:47.122129411 ProcessGroupNCCL.cpp:4561] [PG ID 0 PG GUID 0 Rank 1]  using GPU 1 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+[rank0]:[W226 22:35:47.126753348 ProcessGroupNCCL.cpp:4561] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+[rank2]:[W226 22:35:47.131685818 ProcessGroupNCCL.cpp:4561] [PG ID 0 PG GUID 0 Rank 2]  using GPU 2 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+Namespace(batch_size=256, epochs=300, bce_loss=False, unscale_lr=False, model='violin_tiny_pos_cls_trial2', input_size=224, drop=0.0, drop_path=0.1, model_ema=True, model_ema_decay=0.99996, model_ema_force_cpu=False, opt='adamw', opt_eps=1e-08, opt_betas=None, clip_grad=None, momentum=0.9, weight_decay=0.05, sched='cosine', lr=0.0005, lr_noise=None, lr_noise_pct=0.67, lr_noise_std=1.0, warmup_lr=1e-06, min_lr=1e-05, decay_epochs=30, warmup_epochs=5, cooldown_epochs=10, patience_epochs=10, decay_rate=0.1, color_jitter=0.3, aa='rand-m9-mstd0.5-inc1', smoothing=0.1, train_interpolation='bicubic', repeated_aug=True, train_mode=True, ThreeAugment=False, src=False, reprob=0.25, remode='pixel', recount=1, resplit=False, mixup=0.8, cutmix=1.0, cutmix_minmax=None, mixup_prob=1.0, mixup_switch_prob=0.5, mixup_mode='batch', teacher_model='regnety_160', teacher_path='', distillation_type='none', distillation_alpha=0.5, distillation_tau=1.0, cosub=False, finetune='', attn_only=False, data_path='/iopsstor/scratch/cscs/aafzal/imagenet', data_set='IMNET', inat_category='name', output_dir='/iopsstor/scratch/cscs/aafzal/output2', device='cuda', seed=0, resume='', start_epoch=0, eval=False, eval_crop_ratio=0.875, dist_eval=False, num_workers=10, pin_mem=True, distributed=True, world_size=4, dist_url='env://', rank=0, gpu=0, dist_backend='nccl')
+Creating model: violin_tiny_pos_cls_trial2
+/iopsstor/scratch/cscs/aafzal/Violin-deit/Deit_origional/models_leyla_trial.py:233: UserWarning: torch.range is deprecated and will be removed in a future release because its behavior is inconsistent with Python's range builtin. Instead, use torch.arange, which produces values in [start, end).
+  order = torch.range(0,N-1)
+/iopsstor/scratch/cscs/aafzal/Violin-deit/Deit_origional/models_leyla_trial.py:233: UserWarning: torch.range is deprecated and will be removed in a future release because its behavior is inconsistent with Python's range builtin. Instead, use torch.arange, which produces values in [start, end).
+  order = torch.range(0,N-1)
+/iopsstor/scratch/cscs/aafzal/Violin-deit/Deit_origional/models_leyla_trial.py:233: UserWarning: torch.range is deprecated and will be removed in a future release because its behavior is inconsistent with Python's range builtin. Instead, use torch.arange, which produces values in [start, end).
+  order = torch.range(0,N-1)
+/iopsstor/scratch/cscs/aafzal/Violin-deit/Deit_origional/models_leyla_trial.py:233: UserWarning: torch.range is deprecated and will be removed in a future release because its behavior is inconsistent with Python's range builtin. Instead, use torch.arange, which produces values in [start, end).
+  order = torch.range(0,N-1)
+number of params: 5717452
+/users/aafzal/miniconda3/envs/lion2/lib/python3.9/site-packages/timm/utils/cuda.py:59: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self._scaler = torch.cuda.amp.GradScaler()
+/users/aafzal/miniconda3/envs/lion2/lib/python3.9/site-packages/timm/utils/cuda.py:59: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self._scaler = torch.cuda.amp.GradScaler()
+/users/aafzal/miniconda3/envs/lion2/lib/python3.9/site-packages/timm/utils/cuda.py:59: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self._scaler = torch.cuda.amp.GradScaler()
+/users/aafzal/miniconda3/envs/lion2/lib/python3.9/site-packages/timm/utils/cuda.py:59: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self._scaler = torch.cuda.amp.GradScaler()
+Start training for 300 epochs
+/iopsstor/scratch/cscs/aafzal/Violin-deit/Deit_origional/engine.py:46: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast():
+/iopsstor/scratch/cscs/aafzal/Violin-deit/Deit_origional/engine.py:46: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast():
+/iopsstor/scratch/cscs/aafzal/Violin-deit/Deit_origional/engine.py:46: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast():
+/iopsstor/scratch/cscs/aafzal/Violin-deit/Deit_origional/engine.py:46: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast():
+Epoch: [0]  [   0/1251]  eta: 1:20:04  lr: 0.000001  loss: 6.9171 (6.9171)  time: 3.8409  data: 1.6509  max mem: 8725
+Epoch: [0]  [  10/1251]  eta: 0:09:50  lr: 0.000001  loss: 6.9482 (6.9446)  time: 0.4761  data: 0.1503  max mem: 8768
+Epoch: [0]  [  20/1251]  eta: 0:06:25  lr: 0.000001  loss: 6.9363 (6.9396)  time: 0.1364  data: 0.0002  max mem: 8768
+Epoch: [0]  [  30/1251]  eta: 0:05:11  lr: 0.000001  loss: 6.9389 (6.9416)  time: 0.1334  data: 0.0003  max mem: 8768
+Epoch: [0]  [  40/1251]  eta: 0:04:32  lr: 0.000001  loss: 6.9445 (6.9425)  time: 0.1331  data: 0.0003  max mem: 8768
+Epoch: [0]  [  50/1251]  eta: 0:04:08  lr: 0.000001  loss: 6.9387 (6.9416)  time: 0.1327  data: 0.0003  max mem: 8768
+Epoch: [0]  [  60/1251]  eta: 0:03:52  lr: 0.000001  loss: 6.9395 (6.9424)  time: 0.1335  data: 0.0003  max mem: 8768
+Epoch: [0]  [  70/1251]  eta: 0:03:40  lr: 0.000001  loss: 6.9491 (6.9432)  time: 0.1334  data: 0.0003  max mem: 8768
+Epoch: [0]  [  80/1251]  eta: 0:03:30  lr: 0.000001  loss: 6.9418 (6.9426)  time: 0.1331  data: 0.0003  max mem: 8768
+Epoch: [0]  [  90/1251]  eta: 0:03:22  lr: 0.000001  loss: 6.9436 (6.9434)  time: 0.1331  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 100/1251]  eta: 0:03:16  lr: 0.000001  loss: 6.9480 (6.9434)  time: 0.1330  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 110/1251]  eta: 0:03:10  lr: 0.000001  loss: 6.9407 (6.9428)  time: 0.1335  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 120/1251]  eta: 0:03:05  lr: 0.000001  loss: 6.9340 (6.9420)  time: 0.1335  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 130/1251]  eta: 0:03:01  lr: 0.000001  loss: 6.9340 (6.9420)  time: 0.1338  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 140/1251]  eta: 0:02:57  lr: 0.000001  loss: 6.9358 (6.9413)  time: 0.1339  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 150/1251]  eta: 0:02:54  lr: 0.000001  loss: 6.9354 (6.9414)  time: 0.1334  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 160/1251]  eta: 0:02:51  lr: 0.000001  loss: 6.9409 (6.9413)  time: 0.1335  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 170/1251]  eta: 0:02:48  lr: 0.000001  loss: 6.9342 (6.9405)  time: 0.1337  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 180/1251]  eta: 0:02:45  lr: 0.000001  loss: 6.9310 (6.9402)  time: 0.1333  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 190/1251]  eta: 0:02:42  lr: 0.000001  loss: 6.9310 (6.9396)  time: 0.1328  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 200/1251]  eta: 0:02:39  lr: 0.000001  loss: 6.9307 (6.9393)  time: 0.1330  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 210/1251]  eta: 0:02:37  lr: 0.000001  loss: 6.9355 (6.9393)  time: 0.1332  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 220/1251]  eta: 0:02:35  lr: 0.000001  loss: 6.9396 (6.9392)  time: 0.1333  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 230/1251]  eta: 0:02:32  lr: 0.000001  loss: 6.9379 (6.9394)  time: 0.1328  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 240/1251]  eta: 0:02:30  lr: 0.000001  loss: 6.9417 (6.9396)  time: 0.1315  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 250/1251]  eta: 0:02:28  lr: 0.000001  loss: 6.9327 (6.9390)  time: 0.1312  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 260/1251]  eta: 0:02:26  lr: 0.000001  loss: 6.9327 (6.9392)  time: 0.1310  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 270/1251]  eta: 0:02:24  lr: 0.000001  loss: 6.9365 (6.9391)  time: 0.1302  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 280/1251]  eta: 0:02:21  lr: 0.000001  loss: 6.9375 (6.9391)  time: 0.1304  data: 0.0002  max mem: 8768
+Epoch: [0]  [ 290/1251]  eta: 0:02:20  lr: 0.000001  loss: 6.9375 (6.9389)  time: 0.1319  data: 0.0002  max mem: 8768
+Epoch: [0]  [ 300/1251]  eta: 0:02:18  lr: 0.000001  loss: 6.9293 (6.9386)  time: 0.1325  data: 0.0002  max mem: 8768
+Epoch: [0]  [ 310/1251]  eta: 0:02:16  lr: 0.000001  loss: 6.9313 (6.9386)  time: 0.1322  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 320/1251]  eta: 0:02:14  lr: 0.000001  loss: 6.9345 (6.9384)  time: 0.1323  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 330/1251]  eta: 0:02:12  lr: 0.000001  loss: 6.9336 (6.9384)  time: 0.1327  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 340/1251]  eta: 0:02:10  lr: 0.000001  loss: 6.9336 (6.9383)  time: 0.1324  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 350/1251]  eta: 0:02:09  lr: 0.000001  loss: 6.9328 (6.9380)  time: 0.1318  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 360/1251]  eta: 0:02:07  lr: 0.000001  loss: 6.9341 (6.9380)  time: 0.1319  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 370/1251]  eta: 0:02:05  lr: 0.000001  loss: 6.9345 (6.9379)  time: 0.1320  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 380/1251]  eta: 0:02:04  lr: 0.000001  loss: 6.9345 (6.9378)  time: 0.1326  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 390/1251]  eta: 0:02:02  lr: 0.000001  loss: 6.9364 (6.9379)  time: 0.1326  data: 0.0003  max mem: 8768
+Epoch: [0]  [ 400/1251]  eta: 0:02:00  lr: 0.000001  loss: 6.9355 (6.9377)  time: 0.1323  data: 0.0002  max mem: 8768
+slurmstepd: error: *** JOB 203689 ON nid005545 CANCELLED AT 2025-02-26T22:37:03 ***

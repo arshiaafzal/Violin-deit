@@ -9,9 +9,7 @@ from timm.models.layers import trunc_normal_, DropPath
 from curves import compute_curve_order, coords_to_index, index_to_coords_indexes
 import numpy as np
 
-__all__ = ['violin_base_patch16_224',
-
-]
+__all__ = ['violin_base_patch16_224',]
 
 def Casual_Mask_Decay(a_i , L):
     idx = torch.arange(L,device=a_i.device)

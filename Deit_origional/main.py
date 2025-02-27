@@ -53,6 +53,8 @@ def get_args_parser():
     parser.set_defaults(model_ema=True)
     parser.add_argument('--model-ema-decay', type=float, default=0.99996, help='')
     parser.add_argument('--model-ema-force-cpu', action='store_true', default=False, help='')
+    parser.add_argument('--cls_tok', default=True , action='store_false')
+    parser.add_argument('--pos_emb', default=True , action='store_false')   
 
     # Optimizer parameters
     parser.add_argument('--opt', default='adamw', type=str, metavar='OPTIMIZER',
@@ -269,7 +271,9 @@ def main(args):
         drop_rate=args.drop,
         drop_path_rate=args.drop_path,
         drop_block_rate=None,
-        img_size=args.input_size
+        img_size=args.input_size,
+        cls_tok = args.cls_tok,
+        pos_emb = args.pos_emb
     )
 
                     
