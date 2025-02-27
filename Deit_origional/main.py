@@ -23,9 +23,9 @@ from losses import DistillationLoss
 from samplers import RASampler
 from augment import new_data_aug_generator
 
-import models
-import models_v2
-import models_violin
+# import models
+# import models_v2
+# import models_violin
 import models_leyla_trial
 
 import utils
@@ -53,8 +53,16 @@ def get_args_parser():
     parser.set_defaults(model_ema=True)
     parser.add_argument('--model-ema-decay', type=float, default=0.99996, help='')
     parser.add_argument('--model-ema-force-cpu', action='store_true', default=False, help='')
-    parser.add_argument('--cls_tok', default=True , action='store_false')
-    parser.add_argument('--pos_emb', default=True , action='store_false')   
+
+    # Violin parameters
+    parser.add_argument('--cls_tok', default=False , action='store_true')
+    parser.add_argument('--pos_emb', default=False , action='store_true')   
+    parser.add_argument('--qk_norm', default=False , action='store_true')   
+    parser.add_argument('--scale', default=False , action='store_true')   
+    parser.add_argument('curves',nargs="*",default=['s', 'sr', 'h', 'hr', 'm', 'mr'],  help="List of curves")
+
+    parser.add_argument('--mask', default='weighted', choices=['weighted', 'plain', 'fixed'], type=str)
+    parser.add_argument('--method', default='weighted', choices=['mul_v1', 'mul_v2', 'add_v1'], type=str)
 
     # Optimizer parameters
     parser.add_argument('--opt', default='adamw', type=str, metavar='OPTIMIZER',
@@ -69,6 +77,7 @@ def get_args_parser():
                         help='SGD momentum (default: 0.9)')
     parser.add_argument('--weight-decay', type=float, default=0.05,
                         help='weight decay (default: 0.05)')
+    
     # Learning rate schedule parameters
     parser.add_argument('--sched', default='cosine', type=str, metavar='SCHEDULER',
                         help='LR scheduler (default: "cosine"')
@@ -272,8 +281,14 @@ def main(args):
         drop_path_rate=args.drop_path,
         drop_block_rate=None,
         img_size=args.input_size,
+
         cls_tok = args.cls_tok,
-        pos_emb = args.pos_emb
+        pos_emb = args.pos_emb,
+        qk_norm = args.qk_norm,
+        scale = args.scale,
+        curve_list = args.curves,
+        mask = args.mask,
+        method = args.method,
     )
 
                     
