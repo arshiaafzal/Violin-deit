@@ -66,7 +66,7 @@ class Violin_Attention(nn.Module):
             curve_coords = compute_curve_order(grid, curve)
             self.curve_indices_inv.append(torch.tensor(index_to_coords_indexes(curve_coords, S,S)  , dtype=torch.long ))  
             if mask == 'fixed':
-                self.ai_list.append(torch.ones(num_heads) * 0.9999)
+                self.ai_list.append(torch.ones(num_heads) * 0.996)
             else:
                 self.ai_list.append(nn.Parameter(torch.randn(num_heads)))
 
@@ -119,9 +119,19 @@ class Violin_Attention(nn.Module):
             attn = attn * (1 + M * self.normalize.view(1,-1,1,1))
         elif self.method == 'add_v1':
             attn = attn + M * self.normalize.view(1,-1,1,1)
+        elif  self.method == 'mul_after_sm':  
+            pass
+        elif  self.method == 'add_after_sm': 
+            pass 
+ 
 
         attn = attn.softmax(dim=-1)
         attn = self.attn_drop(attn)
+        
+        if self.method == 'mul_after_sm':  
+            attn = attn * M * self.normalize.view(1,-1,1,1)
+        elif self.method == 'add_after_sm': 
+            attn = attn + M * self.normalize.view(1,-1,1,1)
 
         x = (attn @ v).transpose(1, 2).reshape(B, N, C)
         x = self.proj(x)

@@ -62,7 +62,7 @@ def get_args_parser():
     parser.add_argument('curves',nargs="*",default=['s', 'sr', 'h', 'hr', 'm', 'mr'],  help="List of curves")
 
     parser.add_argument('--mask', default='weighted', choices=['weighted', 'plain', 'fixed'], type=str)
-    parser.add_argument('--method', default='weighted', choices=['mul_v1', 'mul_v2', 'add_v1'], type=str)
+    parser.add_argument('--method', default='weighted', choices=['mul_v1', 'mul_v2', 'add_v1' , 'mul_after_sm' , 'add_after_sm'], type=str)
 
     # Optimizer parameters
     parser.add_argument('--opt', default='adamw', type=str, metavar='OPTIMIZER',
