@@ -59,9 +59,12 @@ def get_args_parser():
     parser.add_argument('--pos_emb', default=False , action='store_true')   
     parser.add_argument('--qk_norm', default=False , action='store_true')   
     parser.add_argument('--scale', default=False , action='store_true')   
-    parser.add_argument('curves',nargs="*",default=['s', 'sr', 'h', 'hr', 'm', 'mr'],  help="List of curves")
+    parser.add_argument('--initialize', default=False , action='store_true')   # To initialize between 0.995 and 0.999
+    parser.add_argument('curves',nargs="*",default=['s', 'sr', 'h', 'hr', 'm', 'mr','z', 'zr'],  help="List of curves")
 
-    parser.add_argument('--mask', default='weighted', choices=['weighted', 'plain', 'fixed'], type=str)
+    parser.add_argument('--mask_sum', default='weighted', choices=['weighted', 'softmax', 'plain', 'linweight'], type=str)
+    parser.add_argument('--mask', default='learned', choices=['fixed', 'learned'], type=str)
+
     parser.add_argument('--method', default='weighted', choices=['mul_v1', 'mul_v2', 'add_v1' , 'mul_after_sm' , 'add_after_sm'], type=str)
 
     # Optimizer parameters
@@ -286,8 +289,10 @@ def main(args):
         pos_emb = args.pos_emb,
         qk_norm = args.qk_norm,
         scale = args.scale,
+        initialize = args.initialize,
         curve_list = args.curves,
         mask = args.mask,
+        mask_sum = args.mask_sum,
         method = args.method,
     )
 

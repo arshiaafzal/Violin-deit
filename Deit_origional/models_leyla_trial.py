@@ -32,7 +32,7 @@ def max_min(x):
 
 class Violin_Attention(nn.Module):
     def __init__(self, dim, num_heads=8, qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0., 
-                 pos_emb = True, cls_tok = True, curve_list = ['s', 'sr', 'h', 'hr', 'm', 'mr'],num_patches=196, qk_norm=False,mask='weighted',scale=True,method='mul_v1'):
+                 pos_emb = True, cls_tok = True, curve_list = ['s', 'sr', 'h', 'hr', 'm', 'mr','z', 'zr'],num_patches=196, qk_norm=False,mask='learned',scale=False,method='mul_v1',mask_sum='weighted'):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
@@ -48,11 +48,11 @@ class Violin_Attention(nn.Module):
         self.curve_list = curve_list
         self.qk_norm = qk_norm
         self.mask = mask
+        self.mask_sum = mask_sum
         self.scale = scale
         self.method = method
 
         self.curve_indices_inv = []
-        self.ai_list = []
 
         N = num_patches 
         order = torch.range(0,N-1)
@@ -60,27 +60,31 @@ class Violin_Attention(nn.Module):
         grid = order.view(S,S).clone()
 
         for curve in curve_list:
-            if curve not in ['s', 'sr', 'h', 'hr', 'm', 'mr']:
-                raise ValueError("Invalid value for curve. Allowed values are: 's', 'sr', 'h', 'hr', 'm', 'mr'.")
-            
+            if curve not in ['s', 'sr', 'h', 'hr', 'm', 'mr', 'z', 'zr']:
+                raise ValueError("Invalid value for curve. Allowed values are: 's', 'sr', 'h', 'hr', 'm', 'mr', 'z', 'zr'.")
             curve_coords = compute_curve_order(grid, curve)
             self.curve_indices_inv.append(torch.tensor(index_to_coords_indexes(curve_coords, S,S)  , dtype=torch.long ))  
-            if mask == 'fixed':
-                self.ai_list.append(torch.ones(num_heads) * 0.996)
-            else:
-                self.ai_list.append(nn.Parameter(torch.randn(num_heads)))
+        
+        self.num_curves = len(self.curve_indices_inv)
+
+        if mask == 'fixed':
+            self.register_buffer("ai_list", torch.stack([torch.ones(num_heads) * 0.996 for _ in range(self.num_curves )]))
+        else:
+            self.ai_list = nn.ParameterList([nn.Parameter(torch.empty(num_heads)) for _ in range(self.num_curves )])
 
         if qk_norm:
             self.q_norm = nn.LayerNorm(head_dim)
             self.k_norm = nn.LayerNorm(head_dim)
 
-        if mask == 'weighted':
-            self.mask_weights = nn.Parameter(torch.randn(len(self.ai_list)))
+        if mask_sum == 'plain':
+            self.mask_weights = torch.ones(self.num_curves ) / self.num_curves 
+        elif mask_sum == 'linweight':
+            self.mask_weights = nn.Linear(dim, self.num_curves * num_heads, bias=qkv_bias)
         else:
-            self.mask_weights =torch.ones(len(self.ai_list)) / len(self.ai_list)
+            self.mask_weights = nn.Parameter(torch.empty(self.num_curves))
 
         if scale:
-            self.normalize = nn.Parameter(torch.randn(num_heads))
+            self.normalize = nn.Parameter(torch.empty(num_heads))
         else:
             self.normalize = torch.ones(num_heads)
 
@@ -96,9 +100,19 @@ class Violin_Attention(nn.Module):
         attn = (q @ k.transpose(-2, -1)) * self.scale
 
         H = self.num_heads
-        num_curves = len(self.ai_list)
+        num_curves = self.num_curves
         dev = x.device
         M = torch.zeros(1,H,N,N,device=dev)
+
+        if self.mask_sum == 'linweight':
+            z = self.mask_weights(x).reshape(B, N, self.num_heads, num_curves)
+            z = torch.mean(z, dim=1)
+            mask_weights = torch.softmax(z, dim=-1).permute(0,2,1)
+            M = torch.zeros(B,H,N,N,device=dev)
+        elif self.mask_sum == 'softmax':
+            mask_weights = nn.functional.softmax(self.mask_weights)
+        else:
+            mask_weights = self.mask_weights
 
         for c in range(num_curves):
             if self.mask == 'fixed':
@@ -107,10 +121,14 @@ class Violin_Attention(nn.Module):
                 M_c = Casual_Mask_Decay(self.ai_list[c].to(dev), attn.shape[-1])
             ind = self.curve_indices_inv[c]
             M_c = M_c[:,:,ind][...,ind]
-            w = self.mask_weights[c]
             if self.cls_tok:
                 M_c = torch.cat((torch.ones((1,H,1,N), device=dev),torch.cat((torch.ones((1,H,N-1,1), device=dev),M_c),dim=-1)),dim=-2)
-            M += w * M_c 
+            if self.mask_sum == 'linweight':
+                w = mask_weights[:,c]
+                M += w.view(B,-1,1,1) * M_c 
+            else:
+                w = mask_weights[c]
+                M += w * M_c 
 
 
         if self.method == 'mul_v1':        
@@ -143,12 +161,12 @@ class Violin_Block(nn.Module):
 
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0., attn_drop=0.,
                  drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, 
-                 pos_emb = True, cls_tok = True, curve_list = ['s', 'sr', 'h', 'hr', 'm', 'mr'], num_patches=196, qk_norm=False,mask='weighted',scale=True,method='mul_v1'):
+                 pos_emb = True, cls_tok = True, curve_list = ['s', 'sr', 'h', 'hr', 'm', 'mr','z', 'zr'], num_patches=196, qk_norm=False,mask='learned',scale=False,method='mul_v1',mask_sum='weighted'):
         super().__init__()
         self.norm1 = norm_layer(dim)
         self.attn = Violin_Attention(
             dim, num_heads=num_heads, qkv_bias=qkv_bias, qk_scale=qk_scale, attn_drop=attn_drop, proj_drop=drop, 
-            pos_emb = pos_emb, cls_tok = cls_tok, curve_list = curve_list, num_patches=num_patches, qk_norm=qk_norm, mask=mask, scale=scale, method=method)
+            pos_emb = pos_emb, cls_tok = cls_tok, curve_list = curve_list, num_patches=num_patches, qk_norm=qk_norm, mask=mask, scale=scale, method=method, mask_sum=mask_sum)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
@@ -166,7 +184,7 @@ class Violin_Transformer(nn.Module):
     def __init__(self, img_size=224, patch_size=16, in_chans=3, num_classes=1000, embed_dim=768, depth=12,
                  num_heads=12, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop_rate=0., attn_drop_rate=0.,
                  drop_path_rate=0., hybrid_backbone=None, norm_layer=nn.LayerNorm, 
-                 pos_emb = True, cls_tok = True, curve_list = ['s', 'sr', 'h', 'hr', 'm', 'mr'],qk_norm=False, mask='weighted',scale=True,method='mul_v1'):
+                 pos_emb = True, cls_tok = True, curve_list = ['s', 'sr', 'h', 'hr', 'm', 'mr','z', 'zr'],qk_norm=False, mask='learned',scale=False,method='mul_v1',initialize=False,mask_sum='weighted'):
         super().__init__()
         self.num_classes = num_classes
         self.num_features = self.embed_dim = embed_dim  # num_features for consistency with other models
@@ -181,6 +199,7 @@ class Violin_Transformer(nn.Module):
 
         self.cls_tok = cls_tok
         self.pos_emb = pos_emb
+        self.initialize = initialize
 
         if cls_tok:
             self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
@@ -197,7 +216,7 @@ class Violin_Transformer(nn.Module):
             Violin_Block(
                 dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, qk_scale=qk_scale,
                 drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer, 
-                pos_emb = pos_emb, cls_tok = cls_tok, curve_list=curve_list, num_patches=num_patches, qk_norm=qk_norm, mask=mask, scale=scale, method=method)
+                pos_emb = pos_emb, cls_tok = cls_tok, curve_list=curve_list, num_patches=num_patches, qk_norm=qk_norm, mask=mask, scale=scale, method=method, mask_sum=mask_sum)
             for i in range(depth)])
         self.norm = norm_layer(embed_dim)
 
@@ -224,6 +243,22 @@ class Violin_Transformer(nn.Module):
         elif isinstance(m, nn.LayerNorm):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
+        elif isinstance(m, Violin_Attention):  # Initialize attention parameters
+            if isinstance(m.normalize, nn.Parameter):
+                nn.init.normal_(m.normalize, mean=0.0, std=0.5)
+            if isinstance(m.mask_weights, nn.Parameter):
+                nn.init.uniform_(m.mask_weights, a=-1.0, b=1.0)
+            elif isinstance(m.mask_weights, nn.Linear):
+                trunc_normal_(m.mask_weights.weight, std=.02)
+                if isinstance(m.mask_weights, nn.Linear) and m.mask_weights.bias is not None:
+                    nn.init.constant_(m.mask_weights.bias, 0)
+            if isinstance(m.ai_list, nn.ParameterList):  # Only initialize if it's learnable
+                if self.initialize:
+                    for param in m.ai_list:
+                        nn.init.uniform_(m.mask_weights, a=5, b=9)
+                else:
+                    for param in m.ai_list:
+                        nn.init.normal_(param, mean=0.0, std=0.5)
 
     @torch.jit.ignore
     def no_weight_decay(self):

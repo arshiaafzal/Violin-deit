@@ -130,6 +130,27 @@ def s_curve(grid):
             order.extend((x, y) for x in reversed(range(cols)))
     return order
     
+def compute_zigzag_order(grid):
+    """Returns the elements of the grid in diagonal zig-zag order."""
+    n_rows, n_cols = grid.shape
+    indices = []
+    for d in range(n_rows + n_cols - 1):
+        if d % 2 == 0:
+            r = min(d, n_rows - 1)
+            c = d - r
+            while r >= 0 and c < n_cols:
+                indices.append((r, c))
+                r -= 1
+                c += 1
+        else:
+            c = min(d, n_cols - 1)
+            r = d - c
+            while c >= 0 and r < n_rows:
+                indices.append((r, c))
+                c -= 1
+                r += 1
+    return indices
+
 def compute_curve_order(grid, orientation):
     if orientation == 's':
         order = s_curve(grid)
@@ -145,5 +166,10 @@ def compute_curve_order(grid, orientation):
         order = compute_morton_order(grid)
     elif orientation == 'mr':
         order = compute_morton_order(grid)
+        order = [(y,x) for x,y in order]
+    elif orientation == 'z':
+        order = compute_zigzag_order(grid)
+    elif orientation == 'zr':
+        order = compute_zigzag_order(grid)
         order = [(y,x) for x,y in order]
     return order
