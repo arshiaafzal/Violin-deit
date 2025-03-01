@@ -255,7 +255,7 @@ class Violin_Transformer(nn.Module):
             if isinstance(m.ai_list, nn.ParameterList):  # Only initialize if it's learnable
                 if self.initialize:
                     for param in m.ai_list:
-                        nn.init.uniform_(m.mask_weights, a=5, b=9)
+                        nn.init.uniform_(param, a=5, b=9)
                 else:
                     for param in m.ai_list:
                         nn.init.normal_(param, mean=0.0, std=0.5)
