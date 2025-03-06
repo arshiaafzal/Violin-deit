@@ -23,10 +23,11 @@ from losses import DistillationLoss
 from samplers import RASampler
 from augment import new_data_aug_generator
 
-# import models
+import models
 # import models_v2
 # import models_violin
 import models_leyla_trial
+import models_deit3_violin
 
 import utils
 
@@ -285,15 +286,15 @@ def main(args):
         drop_block_rate=None,
         img_size=args.input_size,
 
-        cls_tok = args.cls_tok,
-        pos_emb = args.pos_emb,
-        qk_norm = args.qk_norm,
-        scale = args.scale,
-        initialize = args.initialize,
-        curve_list = args.curves,
-        mask = args.mask,
-        mask_sum = args.mask_sum,
-        method = args.method,
+        # cls_tok = args.cls_tok,
+        # pos_emb = args.pos_emb,
+        # qk_norm = args.qk_norm,
+        # scale = args.scale,
+        # initialize = args.initialize,
+        # curve_list = args.curves,
+        # mask = args.mask,
+        # mask_sum = args.mask_sum,
+        # method = args.method,
     )
 
                     
