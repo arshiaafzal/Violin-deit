@@ -132,11 +132,11 @@ class Violin_Attention(nn.Module):
 
 
         if self.method == 'mul_v1':        
-            attn = attn * M * self.normalize.view(1,-1,1,1)
+            attn = attn * M * self.normalize.view(1,-1,1,1).to(dev)
         elif self.method == 'mul_v2':  
-            attn = attn * (1 + M * self.normalize.view(1,-1,1,1))
+            attn = attn * (1 + M * self.normalize.view(1,-1,1,1)).to(dev)
         elif self.method == 'add_v1':
-            attn = attn + M * self.normalize.view(1,-1,1,1)
+            attn = attn + M * self.normalize.view(1,-1,1,1).to(dev)
         elif  self.method == 'mul_after_sm':  
             pass
         elif  self.method == 'add_after_sm': 
@@ -278,6 +278,22 @@ class violin_models(nn.Module):
         elif isinstance(m, nn.LayerNorm):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
+        elif isinstance(m, Violin_Attention):  # Initialize attention parameters
+            if isinstance(m.normalize, nn.Parameter):
+                nn.init.normal_(m.normalize, mean=0.0, std=0.5)
+            if isinstance(m.mask_weights, nn.Parameter):
+                nn.init.uniform_(m.mask_weights, a=-1.0, b=1.0)
+            elif isinstance(m.mask_weights, nn.Linear):
+                trunc_normal_(m.mask_weights.weight, std=.02)
+                if isinstance(m.mask_weights, nn.Linear) and m.mask_weights.bias is not None:
+                    nn.init.constant_(m.mask_weights.bias, 0)
+            if isinstance(m.ai_list, nn.ParameterList):  # Only initialize if it's learnable
+                if self.initialize:
+                    for param in m.ai_list:
+                        nn.init.uniform_(param, a=5, b=9)
+                else:
+                    for param in m.ai_list:
+                        nn.init.normal_(param, mean=0.0, std=0.5)
 
     @torch.jit.ignore
     def no_weight_decay(self):
@@ -297,17 +313,20 @@ class violin_models(nn.Module):
         B = x.shape[0]
         x = self.patch_embed(x)
 
-        cls_tokens = self.cls_token.expand(B, -1, -1)
-        
-        x = x + self.pos_embed
-        
-        x = torch.cat((cls_tokens, x), dim=1)
-            
-        for i , blk in enumerate(self.blocks):
+        if self.cls_tok:
+            cls_tokens = self.cls_token.expand(B, -1, -1)  # stole cls_tokens impl from Phil Wang, thanks
+            x = torch.cat((cls_tokens, x), dim=1)
+        if self.pos_emb:
+            x = x + self.pos_embed
+            x = self.pos_drop(x)
+
+        for blk in self.blocks:
             x = blk(x)
-            
+
         x = self.norm(x)
-        return x[:, 0]
+        if self.cls_tok:
+            return x[:, 0]
+        return torch.mean(x, dim=1)
 
     def forward(self, x):
 
